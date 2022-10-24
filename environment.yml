@@ -1,0 +1,7 @@
+name: ILN250_PV_AV_T1
+channels:
+  - javascript
+dependencies:
+  - python=3.9
+  - numpy=1.21.*
+  - pip
