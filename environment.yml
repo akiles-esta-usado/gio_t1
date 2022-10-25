@@ -3,6 +3,7 @@ channels:
   - javascript
 dependencies:
   - python=3.9
-  - numpy=1.21.*
+  - numpy
+  - matplotlib
   - pip
-  - jupyter
+  - jupyter=1.0.0
