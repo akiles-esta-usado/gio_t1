@@ -1,4 +1,3 @@
-@echo off
 SETLOCAL
 
-conda env create -f environment.yml
+conda activate ILN250_PV_AV_T1
