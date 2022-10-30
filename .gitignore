@@ -129,5 +129,5 @@ dmypy.json
 .pyre/
 
 
-*.ipynb
-!notebook.example.ipynb
+# *.ipynb
+# !notebook.example.ipynb
