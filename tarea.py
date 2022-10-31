@@ -44,7 +44,9 @@ for point in instanceGenerator():
     fdd=fdd
   )
 
-  results: Capture = metodo_gradiente(initial_state)
+  #results: Capture = metodo_gradiente(initial_state)
+  results: Capture = metodo_newton(initial_state)
 
   print(results)
   print()
+  break

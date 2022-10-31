@@ -73,8 +73,7 @@ def backtracking_line_search(state: State):
     L_Der = f(punto) + alpha * t * np.dot(fd(punto), - fd(punto))
 
     if L_Der > L_Izq:
-      state.punto = punto - t * fd(punto)
-      break
+      return t
 
     t = t * beta
 
@@ -95,8 +94,9 @@ def metodo_gradiente(state: State, epsilon=0.001):
 
     capture_update(state, capture)
 
-    backtracking_line_search(state)
-  
+    t = backtracking_line_search(state)
+    state.punto = state.punto - t * fd(state.punto)
+
   return capture
 
 
@@ -116,7 +116,7 @@ def metodo_newton(state: State, epsilon=0.001):
   while True:
 
 
-    dx = -np.dot(
+    delta_x_nt = - np.dot(
       np.linalg.inv(fdd(state.punto)),
       np.transpose(fd(state.punto))
     )
@@ -127,14 +127,14 @@ def metodo_newton(state: State, epsilon=0.001):
       fd(state.punto)
     ])
 
-    if l2/2 <= epsilon or state.k > 10000:
+    if l2/2 <= epsilon or capture.k > 10000:
       break
 
     capture_update(state, capture)
 
-    backtracking_line_search(state)
-
-    pass
+    # ESTO NO SE SI ESTÁ BIEN :(
+    t = backtracking_line_search(state)
+    state.punto = state.punto + t * delta_x_nt
   
   return capture
 
