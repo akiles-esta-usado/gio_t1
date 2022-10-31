@@ -3,7 +3,6 @@ import numpy as np
 from dataclasses import dataclass
 from typing import Any, Callable
 
-
 import numpy as np
 
 
@@ -38,29 +37,11 @@ class State:
   fd: Callable[..., Any]
 
 
+
 @dataclass
 class Capture:
   k: int
   FO_optima: list
-
-
-def state_update(state: State):
-  punto = state.punto
-  alpha = state.alpha
-  beta = state.beta
-  f = state.f
-  fd = state.fd
-
-  t = 1.0
-
-  while True:
-    LR = f(punto) + alpha * t * np.dot(np.transpose(fd(punto)), - fd(punto))
-    LL = f(punto - t*fd(punto))
-    t = t * beta
-
-    if LR>LL:
-      state.punto = punto - t * fd(punto)
-      break
 
 
 def capture_update(state: State, capture: Capture) -> Capture:
@@ -75,6 +56,33 @@ def capture_update(state: State, capture: Capture) -> Capture:
     print("hola")
 
 
+
+
+def backtracking_line_search(state: State):
+  punto = state.punto
+  alpha = state.alpha
+  beta = state.beta
+  f = state.f
+  fd = state.fd
+
+  t = 1.0
+
+  while True:
+    L_Izq = f(punto - t*fd(punto))
+    L_Der = f(punto) + alpha * t * np.dot(fd(punto), - fd(punto))
+
+    if L_Der > L_Izq:
+      state.punto = punto - t * fd(punto)
+      break
+
+    t = t * beta
+
+
+def newton(state: State):
+  pass
+
+
+
 def metodo_gradiente(state: State, epsilon=0.001):
   
   capture = Capture(k=0, FO_optima=list())
@@ -82,16 +90,10 @@ def metodo_gradiente(state: State, epsilon=0.001):
   f = state.f
   fd = state.fd
 
-  while True:
-    state_update(state)
-
-    if np.abs(np.linalg.norm(fd(state.punto))) <= epsilon:
-      break
+  while np.abs(np.linalg.norm(fd(state.punto))) > epsilon:
 
     capture_update(state, capture)
 
-
-  capture_update(state, capture)
-  print(f(state.punto), capture.k)
+    backtracking_line_search(state)
   
   return capture

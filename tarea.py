@@ -10,7 +10,6 @@ def f(X):
 
   return (4 - 2.1 * x1**2 + (x1**4)/3) * x1**2 + x1*x2 + (-4 + 4*x2**2) * x2**2
 
-
 def fd(X):
   x1 = X[0]
   x2 = X[1]
@@ -22,7 +21,7 @@ def fd(X):
 
 
 initial_state = State(
-  np.array([0,0]),
+  np.array([1,1]),
   alpha=0.3,
   beta=0.6,
   f=f,
@@ -31,4 +30,4 @@ initial_state = State(
 
 results: Capture = metodo_gradiente(initial_state)
 
-#print(f([0,0]))
+print(results)
