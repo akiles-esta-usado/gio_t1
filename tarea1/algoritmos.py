@@ -35,6 +35,7 @@ class State:
   beta: float
   f: Callable[..., Any]
   fd: Callable[..., Any]
+  fdd: Callable[..., Any]
 
 
 
@@ -97,3 +98,49 @@ def metodo_gradiente(state: State, epsilon=0.001):
     backtracking_line_search(state)
   
   return capture
+
+
+
+
+
+
+
+def metodo_newton(state: State, epsilon=0.001):
+  
+  capture = Capture(k=0, FO_optima=list())
+
+  f = state.f
+  fd = state.fd
+  fdd = state.fdd
+
+  while True:
+
+
+    dx = -np.dot(
+      np.linalg.inv(fdd(state.punto)),
+      np.transpose(fd(state.punto))
+    )
+
+    l2 = np.linalg.multi_dot([
+      np.transpose(fd(state.punto)),
+      np.linalg.inv(fdd(state.punto)),
+      fd(state.punto)
+    ])
+
+    if l2/2 <= epsilon or state.k > 10000:
+      break
+
+    capture_update(state, capture)
+
+    backtracking_line_search(state)
+
+    pass
+  
+  return capture
+
+
+
+# Gradiente ocupa solo el gradiente, 
+# newton toma el valor de gradiente y la tasa de cambio.
+
+# Nosotros usamos un newton adaptado.

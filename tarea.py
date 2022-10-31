@@ -20,14 +20,31 @@ def fd(X):
   ])
 
 
-initial_state = State(
-  np.array([1,1]),
-  alpha=0.3,
-  beta=0.6,
-  f=f,
-  fd=fd
-)
+def fdd(X):
+  x1 = X[0]
+  x2 = X[1]
 
-results: Capture = metodo_gradiente(initial_state)
+  return np.array([
+      [
+        8 - 25.2 * x1**2 + 10 * x1**4,
+        1
+      ], [
+        1,
+        -8 + 48 * x2**2
+      ]
+  ])
 
-print(results)
+for point in instanceGenerator():
+  initial_state = State(
+    point,
+    alpha=0.3,
+    beta=0.6,
+    f=f,
+    fd=fd,
+    fdd=fdd
+  )
+
+  results: Capture = metodo_gradiente(initial_state)
+
+  print(results)
+  print()
