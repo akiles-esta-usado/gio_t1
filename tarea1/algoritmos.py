@@ -1,17 +1,11 @@
 import random
 import numpy as np
-from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Any
 
 import numpy as np
 
-
-def hola():
-  print ("hola")
-
-
-def hola2():
-  print ("hola")
+from tarea1.algorithm_state import State
+from tarea1.captura import *
 
 
 def pointGenerator():
@@ -20,46 +14,14 @@ def pointGenerator():
     random.uniform(-20, 20),
   ])
 
+
 def instanceGenerator():
   return np.array([
     pointGenerator() for _ in range(10)
   ])
 
 
-
-
-@dataclass
-class State:
-  punto: Any
-  alpha: float
-  beta: float
-  f: Callable[..., Any]
-  fd: Callable[..., Any]
-  fdd: Callable[..., Any]
-
-
-
-@dataclass
-class Capture:
-  k: int
-  FO_optima: list
-
-
-def capture_update(state: State, capture: Capture) -> Capture:
-
-  punto = state.punto
-  f = state.f
-
-  capture.k += 1
-  capture.FO_optima.append(f(punto))
-
-  if capture.k % 1000 == 0:
-    print("hola")
-
-
-
-
-def backtracking_line_search(state: State):
+def backtracking_line_search(state: State, step: Any, max_iterations: int = 10_000_000):
   punto = state.punto
   alpha = state.alpha
   beta = state.beta
@@ -68,46 +30,43 @@ def backtracking_line_search(state: State):
 
   t = 1.0
 
-  while True:
-    L_Izq = f(punto - t*fd(punto))
-    L_Der = f(punto) + alpha * t * np.dot(fd(punto), - fd(punto))
+  while max_iterations:
+    max_iterations = max_iterations -1
+
+    L_Izq = f(punto + t*step)
+    L_Der = f(punto) + alpha * t * np.dot(fd(punto), step)
 
     if L_Der > L_Izq:
       return t
 
     t = t * beta
-
-
-def newton(state: State):
-  pass
-
-
-
-def metodo_gradiente(state: State, epsilon=0.001):
   
-  capture = Capture(k=0, FO_optima=list())
+  raise Exception("Backtracking does not finish")
+
+
+def metodo_gradiente(state: State, epsilon=0.0001):
+  
+  capture = Capture()
 
   f = state.f
   fd = state.fd
+
 
   while np.abs(np.linalg.norm(fd(state.punto))) > epsilon:
 
     capture_update(state, capture)
 
-    t = backtracking_line_search(state)
-    state.punto = state.punto - t * fd(state.punto)
+    step = - fd(state.punto)
+    t = backtracking_line_search(state, step)
+    state.punto = state.punto + t * step
 
+  capture_finish(state, capture)
   return capture
 
 
+def metodo_newton(state: State, epsilon=0.0001):
 
-
-
-
-
-def metodo_newton(state: State, epsilon=0.001):
-  
-  capture = Capture(k=0, FO_optima=list())
+  capture = Capture()
 
   f = state.f
   fd = state.fd
@@ -115,32 +74,29 @@ def metodo_newton(state: State, epsilon=0.001):
 
   while True:
 
-
-    delta_x_nt = - np.dot(
-      np.linalg.inv(fdd(state.punto)),
-      np.transpose(fd(state.punto))
-    )
-
     l2 = np.linalg.multi_dot([
       np.transpose(fd(state.punto)),
       np.linalg.inv(fdd(state.punto)),
       fd(state.punto)
     ])
 
-    if l2/2 <= epsilon or capture.k > 10000:
-      break
+    l2 = np.linalg.multi_dot([
+      fd(state.punto),
+      np.linalg.inv(fdd(state.punto)),
+      np.transpose(fd(state.punto))
+    ])
 
     capture_update(state, capture)
 
-    # ESTO NO SE SI ESTÁ BIEN :(
-    t = backtracking_line_search(state)
-    state.punto = state.punto + t * delta_x_nt
-  
+    if l2/2 <= epsilon or capture.k > 10000:
+      break
+
+    step = -np.dot(
+      np.linalg.inv(fdd(state.punto)),
+      np.transpose(fd(state.punto))
+    )
+    t = backtracking_line_search(state, step)
+    state.punto = state.punto + t * step
+
+  capture_finish(state, capture)
   return capture
-
-
-
-# Gradiente ocupa solo el gradiente, 
-# newton toma el valor de gradiente y la tasa de cambio.
-
-# Nosotros usamos un newton adaptado.
