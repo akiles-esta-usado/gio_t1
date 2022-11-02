@@ -112,8 +112,7 @@ for i, point in enumerate(random_points):
     label=rf'método newton, time={results_newton.total_time/1e6}[ms]'
   )
   ax1.set_xlabel("Número de iteraciones")
-  #ax1.set_ylabel("Valor de FO en iteración $k$")
-  ax1.set_ylabel("Valor de log FO en iteración $k$")
+  ax1.set_ylabel("Valor de FO en iteración $k$")
   ax1.set_title(rf'$\alpha = {alpha}$, $\beta = {beta}$')
   ax1.legend(loc="best")
 
